@@ -89,3 +89,36 @@ if choice == "yes" or choice == "y":
 elif choice == "no" or choice == "n":
     print("You decide not to investigate the cabinet. \nYou continue down the hallway, your footsteps echoing off the stone walls.")
     print() #empty line to separate text
+    
+#============================================
+# ESCAPE THE CASTLE - SCENE 3: CORRIDOR ENCOUNTER
+#============================================
+
+# importing random
+import random
+
+
+creatures = ["Spiderling", "Scorned Spirit", "Cultist"]
+
+# Define a function to describe an encounter
+def encounter(random_creature):
+    print("As you continue down the hallway...")
+    print()
+
+# Different outcomes depending on the creature
+    if random_creature == "Spiderling":
+        print("You hear pattering, scurrying in your direction. \nYou have mere moments to react.")
+
+    elif random_creature == "Scorned Spirit":
+        print("A terrible wailing can be heard, louder by each passing second.")
+
+    elif random_creature == "Cultist":
+        print("From the darkness of the corridors you can faintly make out what seems to be a robed shape weilding adorned daggers.")
+
+    print(f"A {random_creature} appears, ready to fight!")
+
+# Randomly select a creature
+random_creature = random.choice(creatures)
+
+ # Pass the chosen creature into the encounter function
+encounter(random_creature)
