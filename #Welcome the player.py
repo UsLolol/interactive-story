@@ -2,9 +2,9 @@
 print("=== ESCAPE THE CASTLE ===")
 print("Welcome, adventurer!")
 #Get player name, age and character class
-playerName = input("Please state your name")
-playerAge = int(input("Please state your age"))
-playerClass = input("What is your preferred class?")
+playerName = input("Please state your name: ")
+playerAge = int(input("Please state your age: "))
+playerClass = input("What is your preferred class?: ")
  
 #Set starting values
 health = 100
@@ -18,6 +18,7 @@ print(f"Class: {playerClass}")
 print(f"Health: {health}")
 print(f"Gold: {gold}")
 print(f"Has Escape Key: {hasKey}")
+print() #empty line to separate text
 
 #Begin the story
 print(f"You, {playerName}, wake up in a damp and dark cell.")
@@ -42,7 +43,7 @@ def cell_1():
 
     # Ask the player what they want to investigate
     # .lower() converts their answer to lowercase
-     choice = input("What would you like to investigate?").lower().replace(" ", "")
+     choice = input("What would you like to investigate?: ").lower().replace(" ", "")
      print() #empty line to separate text
 
     # Check whether the player chose the door
@@ -58,11 +59,14 @@ def cell_1():
     # Check whether the player chose the bed
      elif choice == "bed":
         print("You approach the bed. \nThe bed is small and uncomfortable, with a lumpy pillow. \nYou notice that the bed is not bolted to the floor, and you think you might be able to move it. \nAfter little effort, you manage to move the bed and discover a small key hidden underneath it.")
+    #Add key to inventory + end loop
         hasKey = True
         print() #empty line to separate text
+        pouch.append("Iron Key")
 
+    #If the player chooses none of the options    
      else:
-        print("You decide not to investigate anything in the cell. \nYou are left with the feeling that you are being watched.")
+        print("You decide not to investigate anything available in the cell. \nYou are left with the feeling that you are being watched.")
         print() #empty line to separate text
 
 cell_1()
