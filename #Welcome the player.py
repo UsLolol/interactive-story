@@ -114,10 +114,12 @@ def hallway():
 #============================================
 
 # Define a function to describe an encounter
-def encounter(random_creature):
+def encounter():
+    global creatures
+
     print("As you continue down the hallway...")
     print()#empty line to separate text
-    
+
     # Randomly select a creature
     random_creature = random.choice(creatures)
 
@@ -132,9 +134,7 @@ def encounter(random_creature):
         print("From the darkness of the corridors you can faintly make out what seems to be a robed shape weilding adorned daggers.")
 
     print(f"A {random_creature} appears, ready to fight!")
-
-# Pass the chosen creature into the encounter function
-    encounter(random_creature)
+    print()#empty line to separate text
 
 #============================================
 # ESCAPE THE CASTLE - SCENE 4: THE LIBRARY
@@ -143,11 +143,13 @@ def encounter(random_creature):
 def library():
  
  global hasNote
+ global pouch
 
 #Introducing the scene
  print("After defeating the creature and continuing down the corridor, you find yourself in a library. \nThere are shelves stacked with books, stretching all the way from the floor to the ceiling. \nThe sheer size of this place is enough to leave you in awe.")
- print()
+ print() #empty line to separate text
  print("It is still dark in here, save for scattered torches along the walls. \nUpon closer inspection, it becomes clear that this library hasn't seen any use in a very long time. \nThere is dust on the shelves and the books, as well as the tables and chairs. \nThere are cobwebs scattered in every empty nook and crany of this library.")
+ print() #empty line to separate text
 
  #Loop until player has password
  while hasNote == False :
@@ -157,9 +159,10 @@ def library():
  #Password Investigation
    if choice in ("shelves", "the shelves", "shelf", "the shelf"):
     print("You walk past each and every shelf. Slowly. Looking for anything that may be out of place. \n... \n... \n... \nYou don't notice anything out of the ordinary... \nUntil you come to a sudden stop. \nThis shelf has no dust. The books aren't withering away. It's clean. \nAn uneasy feeling washes over you.")
-    print()
+    print() #empty line to separate text
     while True:
      shelf_choice = input("Do you wish to investigate this shelf?").lower().strip()
+     print() #empty line to separate text
 
      if shelf_choice in ("yes", "y"):
        print("You decide to look through the shelf. \nAt first, no book seems to call your attention. \nAlbeit they seem significantly better preserved than its counterparts throughout the library, they all still seem ordinary. \nAll but one.\nOne of the books located on the shelf seems to be made of plastic. \nYou decide to pull it out, and upon closer inspection, it reveals to be a container rather than a book. \nYou open the container and inside find a piece of paper that reads: ")
@@ -171,20 +174,69 @@ def library():
        #Add password to pouch
        pouch.append("Note - Hylenia")
        hasNote = True
+       print(f"Your pouch now contains: {pouch}")
+       break
 
      elif shelf_choice in ("no", "n"):
        print("You attempt to fight the urge to investigate this shelf, but ultimately, you cannot help but feel there is some importance to it")
+       print() #empty line to separate text
 
      else:
        print("Please answer yes or no.")
+       print() #empty line to separate text
 
  #Torch Investigation
    if choice in ("torches", "torch"):
     print("You decide to take a closer look at the torches in the library. \nIt wouldn't be a bad idea to take one of them with you as you explore. \nBut just as you're about to grab it, you take a second to think through it. \nCarrying a source of light with you will just alert others to your presence. \nMaybe it isn't such a good idea after all. \nYou decide to leave it alone.") 
+    print() #empty line to separate text
 
 #Table Investigation
    if choice in ("tables", "table", "chairs", "chair"):
     print("You approach one of the tables, but just like most things in this place, it contains nothing but dust. \nYou look closer, and see a tiny spider scurry through it. \nYou back away and continue your investigation.")
+    print() #empty line to separate text
 #Anything else
    else:
      print("I didn't quite understand what you wish to investigate. Please try again.")
+     print() #empty line to separate text
+#============================================
+# ESCAPE THE CASTLE - SCENE 5: THE CASTLE GATE
+#============================================
+
+def castle_gate():
+  print("After exiting the library, you arrive at the entrance hall. \nIf the sheer size of the library shocked you, this gate managed to leave you stupified in awe. \nA huge red carpet stretches from the doorway, all the way to the gate. \nWhilst still surrounded by darkness, this time it isn't due to a lack of light. \nThere's a chandelier whose candles burn bright, hanging from the halfway point of the ceiling. \nEnourmous torches litter the walls, burning everso brightly. \nThe darkness in this room is simply a byproduct of light's inability to stretch throughout the entirity of this room.")
+  print() #empty line to separate text
+  print("A big, empty, and rusted blackened iron armour stands in front of the gate. \nAs you approach, it comes to life. \nThe hole of where its head would be, were it human, shine two red orbs. \nInstead of moving the sword clasped within its hands, readying for a fight, it speaks. \nSuch a deep and inhumane voice reverberates through your skull.")
+  print()#empty line to separate text
+  print('"S P E A K  T H E  P A S S W O R D"')
+  print()#empty line to separate text
+
+  #Asking the player to input a password
+  password = input("What do you wish to say?: ")
+  
+  #Making it loop until the password is correct
+  while password != "hylenia":
+    print("The armor groans, and its eyes glisten, as if staring into your soul. \nThe password is not correct.")
+    password = input("Try again. What do you wish to say?: ").lower().replace(" ", "")
+  
+  #Password results
+  if password == "Hylenia":
+    print("As you speak the words, the red orbs slowly fade away with a deep growl. \nThe armor falls to the floor, piece by piece, with various loud clanging sounds.")
+    print()#empty line to separate text
+    print("The ginormous castle wooden doors begin creaking and slowly opening inwards, completely by themselves. \nAs the doors open, instead of being flashed with bright lights, you are met with darkness. \nThere are wide marble stept stretching downards...")
+    print()#empty line to separate text
+    print("CONGRATULATIONS! YOU HAVE FINISHED YOUR JOURNEY THROUGH THE CASTLE! \nGOOD LUCK OUT THERE.")
+
+# ==========================================
+# MAIN GAME
+# ==========================================
+
+def play_game():
+  introduction()
+  cell_1()
+  hallway()
+  encounter()
+  library()
+  castle_gate()
+
+# Start the game
+play_game()
