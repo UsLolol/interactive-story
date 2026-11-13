@@ -10,7 +10,6 @@ playerClass = input("What is your preferred class?")
 health = 100
 gold = 20
 hasKey = False
- 
 #Display the character profile
 print("\n=== YOUR CHARACTER PROFILE ===")
 print(f"Name: {playerName}")
@@ -31,34 +30,42 @@ print("You have no memory of how you got here, but you know you must escape befo
 # ESCAPE THE CASTLE - SCENE 1: THE CELL
 # ==========================================
 
-# Introduce the scene to the player
-print("\nYou are in a small, dimly lit cell with an old wooden door. \nThe walls are made of cold stone, and the only source of light is a small window high up on the wall. \nThere is a small board held up by four tiny sticks and a pillow. \nYou think it is supposed to be a bed.")
-print() #empty line to separate text
+def cell_1():
 
-# Ask the player what they want to investigate
-# .lower() converts their answer to lowercase
-choice = input("What would you like to investigate?").lower().replace(" ", "")
-print() #empty line to separate text
-
-# Check whether the player chose the door
-if choice == "door":
-    print("You approach the door. \nUppon close inspection, nothing seems amiss. \nYou can't see anything past the small grated hole in the door. It is too dark. \nAfter trying to open the door, you quickly realise it is locked. Why wouldn't it be?")
+    global hasKey 
+    # Introduce the scene to the player
+    print("\nYou are in a small, dimly lit cell with an old wooden door. \nThe walls are made of cold stone, and the only source of light is a small window high up on the wall. \nThere is a small board held up by four tiny sticks and a pillow. \nYou think it is supposed to be a bed.")
     print() #empty line to separate text
 
-# Check whether the player chose the window
-elif choice == "window":
-    print("You approach the window. \nThe window is small and high up on the wall. \nThe sky is visible through the small opening, and it dark and devoid of any life. \nAfter trying to open the window, you stop and realise... you can't just push open iron bars.")
-    print() #empty line to separate text
+    #Loop until player has key
+    while hasKey == False:
 
-# Check whether the player chose the bed
-elif choice == "bed":
-    print("You approach the bed. \nThe bed is small and uncomfortable, with a lumpy pillow. \nYou notice that the bed is not bolted to the floor, and you think you might be able to move it. \nAfter little effort, you manage to move the bed and discover a small key hidden underneath it.")
-    print() #empty line to separate text
+    # Ask the player what they want to investigate
+    # .lower() converts their answer to lowercase
+     choice = input("What would you like to investigate?").lower().replace(" ", "")
+     print() #empty line to separate text
 
-else:
-    print("You decide not to investigate anything in the cell. \nYou are left with the feeling that you are being watched.")
-    print() #empty line to separate text
+    # Check whether the player chose the door
+     if choice == "door":
+        print("You approach the door. \nUppon close inspection, nothing seems amiss. \nYou can't see anything past the small grated hole in the door. It is too dark. \nAfter trying to open the door, you quickly realise it is locked. Why wouldn't it be?")
+        print() #empty line to separate text
 
+    # Check whether the player chose the window
+     elif choice == "window":
+        print("You approach the window. \nThe window is small and high up on the wall. \nThe sky is visible through the small opening, and it dark and devoid of any life. \nAfter trying to open the window, you stop and realise... you can't just push open iron bars.")
+        print() #empty line to separate text
+
+    # Check whether the player chose the bed
+     elif choice == "bed":
+        print("You approach the bed. \nThe bed is small and uncomfortable, with a lumpy pillow. \nYou notice that the bed is not bolted to the floor, and you think you might be able to move it. \nAfter little effort, you manage to move the bed and discover a small key hidden underneath it.")
+        hasKey = True
+        print() #empty line to separate text
+
+     else:
+        print("You decide not to investigate anything in the cell. \nYou are left with the feeling that you are being watched.")
+        print() #empty line to separate text
+
+cell_1()
 #===========================================
 # INVENTORY 
 #===========================================
@@ -97,13 +104,13 @@ elif choice == "no" or choice == "n":
 # importing random
 import random
 
-
+#Creature List
 creatures = ["Spiderling", "Scorned Spirit", "Cultist"]
 
 # Define a function to describe an encounter
 def encounter(random_creature):
     print("As you continue down the hallway...")
-    print()
+    print()#empty line to separate text
 
 # Different outcomes depending on the creature
     if random_creature == "Spiderling":
@@ -120,5 +127,5 @@ def encounter(random_creature):
 # Randomly select a creature
 random_creature = random.choice(creatures)
 
- # Pass the chosen creature into the encounter function
+# Pass the chosen creature into the encounter function
 encounter(random_creature)
