@@ -1,3 +1,6 @@
+# importing random
+import random
+
 #Welcome the player
 print("=== ESCAPE THE CASTLE ===")
 print("Welcome, adventurer!")
@@ -104,9 +107,6 @@ elif choice == "no" or choice == "n":
 #============================================
 # ESCAPE THE CASTLE - SCENE 3: CORRIDOR ENCOUNTER
 #============================================
-
-# importing random
-import random
 
 #Creature List
 creatures = ["Spiderling", "Scorned Spirit", "Cultist"]
