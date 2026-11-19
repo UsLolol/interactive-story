@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import random
 from dotenv import load_dotenv
 from google import genai
 load_dotenv()
@@ -55,6 +56,27 @@ def continue_game():
     st.session_state.room_number += 1
     st.rerun()
 
+def add_item(item):
+    if item not in st.session_state.pouch:
+        st.session_state.pouch.append(item)
+ 
+def has_item(item):
+    return item in st.session_state.pouch
+ 
+def remove_item(item):
+    if item in st.session_state.pouch:
+        st.session_state.pouch.remove(item)
+
+def take_damage(amount):
+    st.session_state.health = st.session_state.health - amount
+    if st.session_state.health < 0:
+        st.session_state.health = 0
+
+def heal_player(amount):
+    old_health = st.session_state.health
+    st.session_state.health = min(st.session_state.max_health, st.session_state.health + amount)
+    return st.session_state.health - old_health
+
 def generate_story(room, action, outcome, fallback_message):
     if client is None:
         return fallback_message
@@ -97,6 +119,29 @@ Do not introduce new choices.
         st.error(f"Gemini error: {error}")
         return fallback_message
 
+def roll_dice():
+    return random.randint(1,6)
+
+def chance_encounter(room, action, success_number, success_outcome, success_fallback, failure_outcome, failure_fallback, damage, bonus_item=""):
+    roll = roll_dice()
+    bonus = 2 if bonus_item and has_item(bonus_item) else 0
+    total = roll + bonus
+
+    roll_message = (f"You rolled: {roll}")
+    if bonus:
+        roll_message += (f" + {bonus} equipment bonus!")
+    roll_message += (f" = {total}.")
+
+    if total >= success_number:
+        story = generate_story(room, action, success_outcome, success_fallback)
+        set_result("success", f"{roll_message} {story}")
+
+    else:
+        take_damage(damage)
+        story = generate_story(room, action, failure_outcome, failure_fallback)
+        set_result("damage", f"{roll_message} {story}", damage)
+
+
 # ================================================================
 # 3. REUSABLE DISPLAY FUNCTIONS — KEEP EVERY ROOM CONSISTENT
 # ================================================================
@@ -129,19 +174,21 @@ def set_result(result_type, message, value = ""):
     st.rerun()
 
 def show_result():
-    kind = st.session_state.result_type 
-    message = st.session_state.result_message
+    kind = st.session_state.result_type
+    value = st.session_state.result_value
+ 
     if kind == "item":
-        st.success(f"🎒 NEW ITEM: {st.session_state.result_value}")
-        st.write(message)
+        st.success(f"🎒 NEW ITEM: {value}")
+    elif kind == "damage":
+        st.error(f"💔 DAMAGE: You lose {value} health.")
+    elif kind == "heal":
+        st.success(f"💚 HEALED: You recover {value} health.")
     elif kind == "success":
-        st.success(message)
+        st.success("✅ Success!")
     else:
-        st.info(message)
-
-def add_item(item):
-    if item not in st.session_state.pouch:
-        st.session_state.pouch.append(item)
+        st.info("The journey continues...")
+ 
+    st.write(st.session_state.result_message)
 
 #Continue button
 def show_continue_button(text = "Continue"):
@@ -166,6 +213,13 @@ else:
     #Show the same player information in every room
     show_player_info()
     room = get_current_room()
+
+    if st.session_state.health <= 0:
+     show_room("💀 Game Over", "Your strength gives out. The castle has claimed another victim.")
+     st.error("You did not escape the castle. Lol")
+     if st.button("🔄 Try Again"):
+        restart_game()
+     st.stop()
 
     # ============================================================
     # ROOM 1 — CELL (MODEL SIMPLE CONTINUE NAVIGATION)
@@ -216,13 +270,18 @@ else:
             left, right = st.columns(2)
             with left:
                 if st.button("🧩 Investigate the metal object"):
-                    outcome = "The player investigates the metal object to find a key"
-                    story = generate_story(
+                    roll = roll_dice()
+                    if roll >= 3:
+                        add_item("Iron Key")
+                        outcome = "The player investigates the metal object to find a key"
+                        story = generate_story(
                         "The Crypt", "investigates the metal object", outcome, "You decide to investigate the glinting object and find an Iron Key. You decide to take it with you."
-                    )
-                    add_item("Iron Key")
-                    set_result("item", story , "Iron Key")
-                    st.rerun()
+                        )
+                        set_result("item", story , "Iron Key")
+                    else:
+                      take_damage(1)
+                      set_result("damage", "You trip while attempting to grab the object and hurt yourself.", 1)
+                      st.rerun()
             with right:
                 if st.button("🚪 Ignore metal object"):
                     outcome = "The player decides to ignore the metal object and continues"
@@ -247,12 +306,27 @@ else:
             left, right = st.columns(2)
             with left:
                 if st.button("📗 Look at the book closer..."):
-                    outcome = "The player opens the book"
-                    story = generate_story(
-                        "The Library", "looks as a glowing book", outcome, "You open the mysterious book. Your mind becomes flooded with ancient magic."
-                    )
-                    set_result("story", story)
-                    st.rerun
+                    roll = roll_dice()
+
+                    if roll >= 5:
+                      healed = heal_player(1)
+                      outcome = "The player opens the book and is healed by its magic."
+                      story = generate_story(
+                        "The Library",
+                        "opens the book",
+                         outcome,
+                         "As you open the mysterious book, your mind becomes flooded with ancient magic. This strange spell seems to have healed you."
+                      )
+                      set_result("heal", f"You rolled {roll}. {story}", healed)
+                    else:
+                        outcome = "The player opens the book, but nothing happens."
+                        story = generate_story(
+                            "The Library",
+                            "opens book",
+                            outcome,
+                            "As you open the book, its light quickly dissipates before you can take a good look. Nothing happens."
+                        )
+                        set_result("story", f"You rolled {roll}. {story}")
             with right:
                 if st.button("🚪 Leave the book alone."):
                     outcome = "The player leaves the book alone"
@@ -277,12 +351,17 @@ else:
             left, right = st.columns(2)
             with left:
                 if st.button("⚔️ Fight the knight"):
-                    outcome = "The player defeats the knight and can continue"
-                    story = generate_story(
-                        "The Guard Room", "fight the ghostly knight", outcome, "You dodge the knight's blows. The armour crashes to the floor after a heated battle."
+                    chance_encounter(
+                        room="The Guard Room",
+                        action="fights the ghostly knight",
+                        success_number=4,
+                        success_outcome="The player defeats the ghostly knight and can continue.",
+                        success_fallback="You stand victorious over the knight's armour on the floor! A path forward presents itself.",
+                        failure_outcome="The knight strikes the player, who loses 1 health and must try again.",
+                        failure_fallback="The knight slashes your arm slightly. You lose 1 health point, but still have enough strength in you to try again.",
+                        damage=1,
+                        bonus_item="Rusty Dagger",
                     )
-                    set_result("success", story)
-                    st.rerun()
             with right:
                 if st.button("🏃 Run past"):
                     outcome = "The player runs past the knight and can continue without injury"
@@ -293,7 +372,12 @@ else:
                     st.rerun()
         else:
             show_result()
-            show_continue_button()
+            if st.session_state.result_type == "damage":
+                if st.button("Try fighting the knight again."):
+                    st.session_state.action_complete = False
+                    st.rerun()
+            else:
+               show_continue_button()
 
     # ============================================================
     # ROOM 6 — DUNGEON (INVENTORY PERSISTS ACROSS ROOMS)
@@ -348,16 +432,28 @@ else:
                 with right:
                     st.warning("🔒 The gate is locked. You do not have the key.")
                     if st.button("🪜 Climb the wall"):
-                        outcome = "The player climbs the castle walls and escapes"
-                        story = generate_story(
-                            "Castle Gate", "climbs the castle walls and escapes", outcome, "After a strenuous climb you manage to get over the walls. You are free!"
-                        )
-                        set_result("success", story)
-                        st.rerun()
+                            chance_encounter(
+                               room="Castle Gate",
+                               action="tries to climb the castle wall",
+                               success_number=4,
+                               success_outcome="The player climbs the wall and escapes.",
+                               success_fallback="You make it over the wall. You are free!",
+                               failure_outcome="The player falls while climbing and loses 1 health.",
+                               failure_fallback="You slip and fall, losing 1 health.",
+                               damage=1,
+                            )
+
         else:
             show_result()
-            st.header("🏆 YOU ESCAPED THE CASTLE!")
-            st.balloons()
+
+            if st.session_state.result_type == "damage":
+                if st.session_state.health >=1:
+                    if st.button("🪜 Try climbing again"):
+                        st.session_state.action_complete = False
+                        st.rerun()
+            else:
+              st.header("🏆 YOU ESCAPED THE CASTLE!")
+              st.balloons()
 
         st.divider()
         if st.button("🔁 Play again"):
